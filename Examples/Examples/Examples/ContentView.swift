@@ -1,9 +1,10 @@
 
 import SwiftUI
+import TreeView
 
 struct ContentView: View {
     var body: some View {
-        Text("Hello, World!")
+        TreeView()
     }
 }
 
