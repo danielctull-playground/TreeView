@@ -30,8 +30,7 @@ fileprivate struct LinesView<Value, ID: Hashable>: View {
     let centers: [ID: Anchor<CGPoint>]
 
     private func point(for value: Value, in proxy: GeometryProxy) -> CGPoint? {
-        let id = value[keyPath: self.id]
-        guard let anchor = centers[id] else { return nil }
+        guard let anchor = centers[value[keyPath: id]] else { return nil }
         return proxy[anchor]
     }
 
