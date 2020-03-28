@@ -20,9 +20,12 @@ struct ContentView: View {
         TreeView(tree: tree, id: \.self) { value in
             Text(value)
                 .padding(8)
+                .background(RoundedRectangle(cornerRadius: 4).fill(Color.white))
                 .background(RoundedRectangle(cornerRadius: 4).stroke(Color.gray))
                 .padding(8)
+                .foregroundColor(.black)
         }
+        .foregroundColor(.gray)
     }
 }
 

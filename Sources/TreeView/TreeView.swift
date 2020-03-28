@@ -17,6 +17,39 @@ public struct TreeView<Value, ID: Hashable, Content: View>: View {
 
     public var body: some View {
         ItemsView(tree: tree, id: id, content: content)
+            .backgroundPreferenceValue(CenterKey.self) {
+                LinesView(tree: self.tree, id: self.id, centers: $0)
+            }
+    }
+}
+
+fileprivate struct LinesView<Value, ID: Hashable>: View {
+
+    let tree: Tree<Value>
+    let id: KeyPath<Value, ID>
+    let centers: [ID: Anchor<CGPoint>]
+
+    private func point(for value: Value, in proxy: GeometryProxy) -> CGPoint {
+        let id = value[keyPath: self.id]
+        guard let anchor = centers[id] else { return .zero }
+        return proxy[anchor]
+    }
+
+    private var treeID: KeyPath<Tree<Value>, ID> { (\Tree.value).appending(path: id) }
+
+    var body: some View {
+        GeometryReader { proxy in
+            ForEach(self.tree.children, id: self.treeID) { child in
+                Group {
+                    Path { path in
+                        path.move(to: self.point(for: self.tree.value, in: proxy))
+                        path.addLine(to: self.point(for: child.value, in: proxy))
+                    }
+                    .stroke()
+                    LinesView(tree: child, id: self.id, centers: self.centers)
+                }
+            }
+        }
     }
 }
 
