@@ -19,7 +19,9 @@ struct ContentView: View {
     ])
 
     func insertRandom() {
-        tree.insertRandom("New \(index.next()!)")
+        withAnimation {
+            tree.insertRandom("New \(index.next()!)")
+        }
     }
 
     var body: some View {
@@ -28,6 +30,7 @@ struct ContentView: View {
             Spacer()
             Button(action: insertRandom) { Text("Insert Random") }
         }
+        .padding()
     }
 
     var treeView: some View {

@@ -39,8 +39,12 @@ fileprivate struct LinesView<Value, ID: Hashable>: View {
         GeometryReader { proxy in
             ForEach(self.tree.children, id: \Tree.value + self.id) { child in
                 Group {
-                    LineView(start: self.point(for: self.tree.value, in: proxy),
-                             end: self.point(for: child.value, in: proxy))
+                    self.point(for: self.tree.value, in: proxy).map { start in
+                        self.point(for: child.value, in: proxy).map { end in
+                            Line(start: start, end: end)
+                                .stroke()
+                        }
+                    }
                     LinesView(tree: child, id: self.id, centers: self.centers)
                 }
             }
@@ -48,19 +52,20 @@ fileprivate struct LinesView<Value, ID: Hashable>: View {
     }
 }
 
-fileprivate struct LineView: View {
+fileprivate struct Line: Shape {
 
-    let start: CGPoint?
-    let end: CGPoint?
+    init(start: CGPoint, end: CGPoint) {
+        animatableData = AnimatablePair(AnimatablePair(start.x, start.y), AnimatablePair(end.x, end.y))
+    }
 
-    @ViewBuilder
-    var body: some View {
-        if start != nil && end != nil {
-            Path { path in
-                path.move(to: start!)
-                path.addLine(to: end!)
-            }
-            .stroke()
+    var animatableData: AnimatablePair<AnimatablePair<CGFloat, CGFloat>, AnimatablePair<CGFloat, CGFloat>>
+    var start: CGPoint { CGPoint(x: animatableData.first.first, y: animatableData.first.second) }
+    var end: CGPoint { CGPoint(x: animatableData.second.first, y: animatableData.second.second) }
+
+    func path(in rect: CGRect) -> Path {
+        Path { path in
+            path.move(to: start)
+            path.addLine(to: end)
         }
     }
 }
