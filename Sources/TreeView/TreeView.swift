@@ -30,7 +30,7 @@ fileprivate struct LinesView<Value, ID: Hashable>: View {
     let centers: [ID: Anchor<CGPoint>]
 
     private func point(for value: Value, in proxy: GeometryProxy) -> CGPoint? {
-        guard let anchor = centers[value[keyPath: id]] else { return nil }
+        guard let anchor = centers[id(value)] else { return nil }
         return proxy[anchor]
     }
 
@@ -90,6 +90,10 @@ fileprivate struct ItemsView<Value, ID: Hashable, Content: View>: View {
             }
         }
     }
+}
+
+extension KeyPath {
+    func callAsFunction(_ root: Root) -> Value { root[keyPath: self] }
 }
 
 fileprivate func +<A, B, C>(
