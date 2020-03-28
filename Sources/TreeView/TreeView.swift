@@ -41,15 +41,26 @@ fileprivate struct LinesView<Value, ID: Hashable>: View {
         GeometryReader { proxy in
             ForEach(self.tree.children, id: self.treeID) { child in
                 Group {
-                    Path { path in
-                        path.move(to: self.point(for: self.tree.value, in: proxy))
-                        path.addLine(to: self.point(for: child.value, in: proxy))
-                    }
-                    .stroke()
+                    LineView(start: self.point(for: self.tree.value, in: proxy),
+                             end: self.point(for: child.value, in: proxy))
                     LinesView(tree: child, id: self.id, centers: self.centers)
                 }
             }
         }
+    }
+}
+
+fileprivate struct LineView: View {
+
+    let start: CGPoint
+    let end: CGPoint
+
+    var body: some View {
+        Path { path in
+            path.move(to: start)
+            path.addLine(to: end)
+        }
+        .stroke()
     }
 }
 
