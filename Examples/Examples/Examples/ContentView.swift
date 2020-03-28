@@ -17,7 +17,7 @@ struct ContentView: View {
     ])
 
     var body: some View {
-        TreeView(tree: tree) { value in
+        TreeView(tree: tree, id: \.self) { value in
             Text(value)
                 .padding(8)
                 .background(RoundedRectangle(cornerRadius: 4).stroke(Color.gray))
