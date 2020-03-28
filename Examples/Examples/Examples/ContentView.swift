@@ -2,25 +2,25 @@
 import SwiftUI
 import TreeView
 
-fileprivate var index = (0...).makeIterator()
+fileprivate var index = (8...).makeIterator()
 
 struct ContentView: View {
 
-    @State var tree = Tree(value: "One", children: [
-        Tree(value: "Two"),
-        Tree(value: "Three", children: [
-            Tree(value: "Four", children: [
-                Tree(value: "Five")
+    @State var tree = Tree(value: "1", children: [
+        Tree(value: "2"),
+        Tree(value: "3", children: [
+            Tree(value: "4", children: [
+                Tree(value: "5")
             ]),
-            Tree(value: "Six", children: [
-                Tree(value: "Seven")
+            Tree(value: "6", children: [
+                Tree(value: "7")
             ])
         ])
     ])
 
     func insertRandom() {
         withAnimation {
-            tree.insertRandom("New \(index.next()!)")
+            tree.insertRandom(index.next()!.description)
         }
     }
 
