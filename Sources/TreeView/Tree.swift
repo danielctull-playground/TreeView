@@ -1,7 +1,7 @@
 
 public struct Tree<Value> {
-    let value: Value
-    let children: [Tree<Value>]
+    public let value: Value
+    public var children: [Tree<Value>]
 
     public init(value: Value, children: [Tree<Value>] = []) {
         self.value = value

@@ -29,17 +29,15 @@ fileprivate struct LinesView<Value, ID: Hashable>: View {
     let id: KeyPath<Value, ID>
     let centers: [ID: Anchor<CGPoint>]
 
-    private func point(for value: Value, in proxy: GeometryProxy) -> CGPoint {
+    private func point(for value: Value, in proxy: GeometryProxy) -> CGPoint? {
         let id = value[keyPath: self.id]
-        guard let anchor = centers[id] else { return .zero }
+        guard let anchor = centers[id] else { return nil }
         return proxy[anchor]
     }
 
-    private var treeID: KeyPath<Tree<Value>, ID> { (\Tree.value).appending(path: id) }
-
     var body: some View {
         GeometryReader { proxy in
-            ForEach(self.tree.children, id: self.treeID) { child in
+            ForEach(self.tree.children, id: \Tree.value + self.id) { child in
                 Group {
                     LineView(start: self.point(for: self.tree.value, in: proxy),
                              end: self.point(for: child.value, in: proxy))
@@ -52,15 +50,18 @@ fileprivate struct LinesView<Value, ID: Hashable>: View {
 
 fileprivate struct LineView: View {
 
-    let start: CGPoint
-    let end: CGPoint
+    let start: CGPoint?
+    let end: CGPoint?
 
+    @ViewBuilder
     var body: some View {
-        Path { path in
-            path.move(to: start)
-            path.addLine(to: end)
+        if start != nil && end != nil {
+            Path { path in
+                path.move(to: start!)
+                path.addLine(to: end!)
+            }
+            .stroke()
         }
-        .stroke()
     }
 }
 
@@ -77,12 +78,19 @@ fileprivate struct ItemsView<Value, ID: Hashable, Content: View>: View {
                     [self.tree.value[keyPath: self.id]: anchor]
                 })
             HStack(alignment: .top) {
-                ForEach(tree.children.indices) { index in
-                    ItemsView(tree: self.tree.children[index], id: self.id, content: self.content)
+                ForEach(tree.children, id: \Tree.value + self.id) { child in
+                    ItemsView(tree: child, id: self.id, content: self.content)
                 }
             }
         }
     }
+}
+
+fileprivate func +<A, B, C>(
+    lhs: KeyPath<A, B>,
+    rhs: KeyPath<B, C>
+) -> KeyPath<A, C> {
+    lhs.appending(path: rhs)
 }
 
 fileprivate struct CenterKey<ID: Hashable>: PreferenceKey {
