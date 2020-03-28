@@ -35,16 +35,18 @@ fileprivate struct LinesView<Value, ID: Hashable>: View {
         return proxy[anchor]
     }
 
+    private func line(to child: Tree<Value>, in proxy: GeometryProxy) -> Line? {
+        guard let start = point(for: tree.value, in: proxy) else { return nil }
+        guard let end = point(for: child.value, in: proxy) else { return nil }
+        return Line(start: start, end: end)
+    }
+
     var body: some View {
         GeometryReader { proxy in
             ForEach(self.tree.children, id: \Tree.value + self.id) { child in
                 Group {
-                    self.point(for: self.tree.value, in: proxy).map { start in
-                        self.point(for: child.value, in: proxy).map { end in
-                            Line(start: start, end: end)
-                                .stroke()
-                        }
-                    }
+                    self.line(to: child, in: proxy)?
+                        .stroke()
                     LinesView(tree: child, id: self.id, centers: self.centers)
                 }
             }
@@ -79,9 +81,9 @@ fileprivate struct ItemsView<Value, ID: Hashable, Content: View>: View {
     var body: some View {
         VStack {
             content(tree.value)
-                .anchorPreference(key: CenterKey.self, value: .center, transform: { anchor in
+                .anchorPreference(key: CenterKey.self, value: .center) { anchor in
                     [self.tree.value[keyPath: self.id]: anchor]
-                })
+                }
             HStack(alignment: .top) {
                 ForEach(tree.children, id: \Tree.value + self.id) { child in
                     ItemsView(tree: child, id: self.id, content: self.content)
